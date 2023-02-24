@@ -10,6 +10,11 @@
       "StackName": "amplify-monorepo-staging-121722",
       "StackId": "arn:aws:cloudformation:us-east-1:827603881742:stack/amplify-monorepo-staging-121722/06b050f0-b374-11ed-b864-0e180773691d",
       "AmplifyAppId": "d1kv3qzu4o4diz"
+    },
+    "categories": {
+      "api": {
+        "monorepo": {}
+      }
     }
   }
 }

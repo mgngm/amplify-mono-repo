@@ -2,7 +2,55 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+
+import * as queries from '../src/graphql/queries';
+
+import { Amplify, API, withSSRContext } from "aws-amplify";
+// import { listPosts } from "../src/graphql/queries";
+
+export async function getServerSideProps({ req }) {
+  // Notice how the server uses `API` from `withSSRContext`, instead of the top-level `API`.
+  const SSR = withSSRContext({ req })
+  const { data } = await SSR.API.graphql({
+    query: `
+  query ListTodos(
+    $filter: ModelTodoFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTodos(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`});
+
+  console.log("ssr", data)
+
+  return {
+    props: {
+      posts: data.listTodos.items
+    }
+  }
+}
+
+export default function Home({ posts }) {
+
+
+  // const [posts, setPosts] = useState(undefined);
+
+  // useEffect(() => {
+  //   console.log(posts)
+  // }, [])
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -17,38 +65,16 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+          Powered by AWS Amplify
         </p>
 
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+          {posts && posts.map(item =>
+            <a key={item.id} href="https://nextjs.org/docs" className={styles.card}>
+              <h2>{item.name} &rarr;</h2>
+              <p>{item.description}</p>
+            </a>
+          )}
         </div>
       </main>
 

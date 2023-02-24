@@ -1,0 +1,36 @@
+version: 1
+applications:
+  - appRoot: nextjs-amplified-app
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - yarn install
+        build:
+          commands:
+            - yarn build
+            - ls -la .next
+            - mkdir -p .next/standalone/node_modules
+            - ls -la
+            - du -sh *
+            - cd ..
+            - ls -la
+            - du -sh *
+            - cd nextjs-amplified-app
+            - cd .next
+            - ls -la
+            - cd standalone
+            - ls -la
+            - du -sh *
+            - cp -r nextjs-amplified-app/* .
+            - cd node_modules
+            - du -sh * | sort -h
+            - cd ../../..
+            - pwd
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
